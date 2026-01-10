@@ -2,20 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>SS14 Document Preview</title>
+  <title>SS14 Document Simulator</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h2>SS14 Document Simulator</h2>
 
   <textarea id="input" placeholder="Type SS14 markup here...">
-[head=1]Captain's Log[/head]
+[head=1][color=Red]Captain's Log[/color][/head]
 [bold]All crew[/bold] must report to the bridge.
-[color=red]Warning:[/color] Check the engine room.
+[bullet] Engines checked
 [head=2]Subsection[/head]
 [italic]Remember to log all actions.[/italic]
-[head=3]Minor notes[/head]
-[underline]Do not forget[/underline] safety procedures.
+\[\[escaped brackets]] show literally
+[] This text is hidden
+[bolditalic][color=DimGray]Bold and Italic Text[/color][/bolditalic]
   </textarea>
 
   <div class="document" id="paper"></div>
