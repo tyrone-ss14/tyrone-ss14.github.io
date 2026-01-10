@@ -2,39 +2,105 @@ const input = document.getElementById("input");
 const paper = document.getElementById("paper");
 
 input.addEventListener("input", render);
+render();
 
+// Parse SS14 markup
 function render() {
-  const text = input.value;
-  paper.innerHTML = parseSS14(text);
+  paper.innerHTML = parseSS14(input.value);
   applyFirstH1Cutoff();
 }
 
-// parse SS14 markup line by line
 function parseSS14(text) {
-  const lines = text.split(/\r?\n/);
-  const parsedLines = lines.map(line => {
-    const trimmed = line.trim();
+  let html = "";
+  let stack = []; // tracks active tags
+  let i = 0;
 
-    // Headers must be alone on the line
-    if (/^\[head=1\].*?\[\/head\]$/i.test(trimmed)) {
-      line = trimmed.replace(/\[head=1\](.*?)\[\/head\]/i, "<h1>$1</h1>");
-    } else if (/^\[head=2\].*?\[\/head\]$/i.test(trimmed)) {
-      line = trimmed.replace(/\[head=2\](.*?)\[\/head\]/i, "<h2>$1</h2>");
-    } else if (/^\[head=3\].*?\[\/head\]$/i.test(trimmed)) {
-      line = trimmed.replace(/\[head=3\](.*?)\[\/head\]/i, "<h3>$1</h3>");
+  while (i < text.length) {
+    if (text[i] === "\\" && text[i+1] === "[") {
+      // escaped bracket
+      html += "[";
+      i += 2;
+      continue;
     }
 
-    // Inline formatting for all lines
-    line = line
-      .replace(/\[bold\](.*?)\[\/bold\]/gi, "<b>$1</b>")
-      .replace(/\[italic\](.*?)\[\/italic\]/gi, "<em>$1</em>")
-      .replace(/\[underline\](.*?)\[\/underline\]/gi, "<u>$1</u>")
-      .replace(/\[color=(.*?)\](.*?)\[\/color\]/gi, '<span style="color:$1">$2</span>');
+    if (text[i] === "[") {
+      // check for hidden []
+      if (text[i+1] === "]") {
+        // hidden block, skip everything inside brackets
+        let end = text.indexOf("]", i+2);
+        if (end === -1) { i += 2; continue; } else { i = end + 1; continue; }
+      }
 
-    return line;
-  });
+      // regex to match tags like [head=1], [color=Red], [bold], etc.
+      const tagMatch = text.slice(i).match(/^\[(\/?)(head|color|bolditalic|bold|italic)(=?)([^\]]*)\]/i);
+      const bulletMatch = text.slice(i).match(/^\[bullet\]/i);
 
-  return parsedLines.join("\n");
+      if (bulletMatch) {
+        html += "• ";
+        i += bulletMatch[0].length;
+        continue;
+      }
+
+      if (tagMatch) {
+        const [fullMatch, slash, tag, eq, value] = tagMatch;
+        i += fullMatch.length;
+
+        if (slash) {
+          // closing tag
+          if (stack.length > 0) {
+            let idx = stack.map(s => s.tag).lastIndexOf(tag.toLowerCase());
+            if (idx !== -1) {
+              // close all tags above this one
+              let closing = "";
+              for (let j = stack.length - 1; j >= idx; j--) {
+                closing += stack[j].htmlClose;
+                stack.pop();
+              }
+              html += closing;
+            }
+          }
+        } else {
+          // opening tag
+          let htmlOpen = "", htmlClose = "";
+          switch(tag.toLowerCase()) {
+            case "head":
+              if (value === "1") { htmlOpen="<h1>"; htmlClose="</h1>"; }
+              else if (value === "2") { htmlOpen="<h2>"; htmlClose="</h2>"; }
+              else if (value === "3") { htmlOpen="<h3>"; htmlClose="</h3>"; }
+              break;
+            case "color":
+              htmlOpen = `<span style="color:${value}">`;
+              htmlClose = "</span>";
+              break;
+            case "bold":
+              htmlOpen = "<b>"; htmlClose = "</b>"; break;
+            case "italic":
+              htmlOpen = "<em>"; htmlClose = "</em>"; break;
+            case "bolditalic":
+              htmlOpen = "<b><em>"; htmlClose = "</em></b>"; break;
+          }
+          html += htmlOpen;
+          stack.push({tag: tag.toLowerCase(), htmlClose});
+        }
+        continue;
+      }
+
+      // unmatched [ → ignore or hide
+      i++;
+      continue;
+    }
+
+    // normal character
+    html += text[i];
+    i++;
+  }
+
+  // close all remaining open tags
+  while (stack.length > 0) {
+    html += stack.pop().htmlClose;
+  }
+
+  return html;
 }
 
 // First-line h1 cut-off like SS14
@@ -42,18 +108,11 @@ function applyFirstH1Cutoff() {
   const doc = paper;
   if (!doc) return;
 
-  // reset all h1 margins
   doc.querySelectorAll("h1").forEach(h => h.style.marginTop = "");
-
-  // find first visible element
   const firstEl = Array.from(doc.children).find(
     el => el.tagName && el.innerText.trim() !== ""
   );
-
   if (firstEl && firstEl.tagName === "H1") {
     firstEl.style.marginTop = "-0.3em";
   }
 }
-
-// Initial render
-render();
