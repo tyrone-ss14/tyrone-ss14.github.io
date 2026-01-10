@@ -24,7 +24,7 @@ textarea {
   padding: 24px 28px;
   background: var(--paper-color, #f4f1dc);
   color: var(--ink-color, #000);
-  font-family: "Segoe UI", Helvetica, Arial, Tahoma, sans-serif;
+  font-family: sans-serif;
   font-size: 16px;
   line-height: 1.25;
   white-space: pre-wrap;
