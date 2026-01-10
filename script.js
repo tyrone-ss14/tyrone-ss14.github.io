@@ -6,6 +6,7 @@ function render() {
 
   text = text.replace(/\[head=1\](.*?)\[\/head\]/gis, "<h1>$1</h1>");
   text = text.replace(/\[bold\](.*?)\[\/bold\]/gis, "<b>$1</b>");
+  text = text.replace(/\[head=3\](.*?)\[\/head\]/gis, "<h3>$1</h3>");
   text = text.replace(/\n/g, "<br>");
 
   paper.innerHTML = text;
