@@ -102,17 +102,3 @@ function parseSS14(text) {
 
   return html;
 }
-
-// First-line h1 cut-off like SS14
-function applyFirstH1Cutoff() {
-  const doc = paper;
-  if (!doc) return;
-
-  doc.querySelectorAll("h1").forEach(h => h.style.marginTop = "");
-  const firstEl = Array.from(doc.children).find(
-    el => el.tagName && el.innerText.trim() !== ""
-  );
-  if (firstEl && firstEl.tagName === "H1") {
-    firstEl.style.marginTop = "-0.3em";
-  }
-}
