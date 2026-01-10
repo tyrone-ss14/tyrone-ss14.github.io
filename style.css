@@ -39,6 +39,10 @@ textarea {
   margin: 0 0 0.4em 0;
 }
 
+.document h1:first-child {
+  margin-top: -0.3em; /* adjust until it visually matches */
+}
+
 .document h2 {
   font-size: 1.3em;
   margin: 0.6em 0 0.3em 0;
