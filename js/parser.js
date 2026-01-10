@@ -1,79 +1,136 @@
-// parser.js
+// parser.js - robust SS14 parser
 
-// Open tag handlers
-const openHandlers = {
-  head: (value, openTags, outputParts) => {
-    const level = parseInt(value, 10) || 1;      // default to h1
-    const tag = `h${level}`;
-    outputParts.push(`<${tag}>`);
-    openTags.push({ type: 'head', tag });
-  }
+// Mapping of header levels to CSS tag
+const HEADER_TAGS = {
+  1: 'h1',
+  2: 'h2',
+  3: 'h3'
 };
 
-// Close tag handlers
-const closeHandlers = {
-  head: (openTags, outputParts) => {
-    for (let i = openTags.length - 1; i >= 0; i--) {
-      if (openTags[i].type === 'head') {
-        const tag = openTags[i].tag;
-        outputParts.push(`</${tag}>`);
-        openTags.splice(i, 1);
-        break;
-      }
-    }
-  }
-};
+// Allowed colors (HTML names)
+const ALLOWED_COLORS = [
+  "Black","DimGray","Gray","DarkGray","Silver","LightGray","Gainsboro",
+  "White","RosyBrown","IndianRed","Brown","Firebrick","DarkRed","Red",
+  "OrangeRed","Tomato","Coral","DarkOrange","Orange","Gold","Yellow",
+  "Olive","YellowGreen","GreenYellow","Chartreuse","LawnGreen","Green",
+  "DarkGreen","SeaGreen","MediumSeaGreen","LightSeaGreen","Teal",
+  "DarkCyan","Aqua","Cyan","DeepSkyBlue","DodgerBlue","RoyalBlue",
+  "Blue","DarkBlue","Navy","Indigo","Purple","DarkMagenta","Magenta",
+  "Fuchsia","HotPink","Pink","LightPink"
+];
+
+// Token regex patterns
+const TAG_REGEX = /\[(\/?)(head|bolditalic|bold|italic|color|bullet)(?:=([^\]]+))?\]/i;
+const ESCAPE_REGEX = /\\(\[)/g;
+const HIDDEN_REGEX = /\[\]/g;
 
 // Main parser function
-function parseSS14(text) {
-  let outputParts = [];
-  let openTags = [];
-  let i = 0;
+function parseSS14(input) {
+  // Escape handling: show \[ as literal [
+  input = input.replace(ESCAPE_REGEX, '$1');
 
-  while (i < text.length) {
-    if (text[i] === "[") {
+  let output = '';
+  let pos = 0;
+  const stack = []; // tracks open tags: {type, extra info}
 
-      // Match opening tag [head=n], case-insensitive
-      const openMatch = text.slice(i).match(/^\[head\s*=\s*(\d+)\]/i);
-      if (openMatch) {
-        const level = parseInt(openMatch[1], 10);
-        openHandlers.head(level, openTags, outputParts);
-        i += openMatch[0].length;
+  while (pos < input.length) {
+    const rest = input.slice(pos);
 
-        // Collect all text until closing [/head] or end of document
-        let headerText = '';
-        while (i < text.length && !text.slice(i).match(/^\[\/head\]/i)) {
-          headerText += text[i];
-          i++;
-        }
-
-        // Trim leading/trailing newlines like SS14
-        headerText = headerText.replace(/^\n+|\n+$/g, '');
-
-        outputParts.push(headerText);
-        continue;
-      }
-
-      // Match closing tag [/head], case-insensitive
-      const closeMatch = text.slice(i).match(/^\[\/head\]/i);
-      if (closeMatch) {
-        closeHandlers.head(openTags, outputParts);
-        i += closeMatch[0].length;
-        continue;
-      }
-
+    // Hidden [] - just skip
+    const hiddenMatch = rest.match(HIDDEN_REGEX);
+    if (hiddenMatch && hiddenMatch.index === 0) {
+      pos += 2;
+      continue;
     }
 
-    // Plain text fallback
-    outputParts.push(text[i]);
-    i++;
+    // Match tags
+    const tagMatch = rest.match(TAG_REGEX);
+    if (tagMatch && tagMatch.index === 0) {
+      const [, closing, tag, value] = tagMatch;
+
+      if (!closing) {
+        // OPENING TAG
+        switch(tag.toLowerCase()) {
+          case 'head': {
+            const level = parseInt(value, 10) || 1;
+            const tagName = HEADER_TAGS[level] || 'h1';
+            output += `<${tagName}>`;
+            stack.push({ type: 'head', tag: tagName });
+            break;
+          }
+          case 'bold': {
+            output += `<b>`;
+            stack.push({ type: 'bold' });
+            break;
+          }
+          case 'italic': {
+            output += `<i>`;
+            stack.push({ type: 'italic' });
+            break;
+          }
+          case 'bolditalic': {
+            output += `<b><i>`;
+            stack.push({ type: 'bolditalic' });
+            break;
+          }
+          case 'color': {
+            const colorName = ALLOWED_COLORS.includes(value) ? value : 'Black';
+            output += `<span style="color:${colorName}">`;
+            stack.push({ type: 'color' });
+            break;
+          }
+          case 'bullet': {
+            output += `• `; // simple bullet
+            break;
+          }
+        }
+      } else {
+        // CLOSING TAG
+        switch(tag.toLowerCase()) {
+          case 'head':
+          case 'bold':
+          case 'italic':
+          case 'bolditalic':
+          case 'color': {
+            // Pop from stack
+            for (let i = stack.length - 1; i >= 0; i--) {
+              const s = stack[i];
+              if (
+                (tag.toLowerCase() === 'bolditalic' && s.type === 'bolditalic') ||
+                (tag.toLowerCase() === s.type)
+              ) {
+                if (s.type === 'head') output += `</${s.tag}>`;
+                else if (s.type === 'bolditalic') output += `</i></b>`;
+                else if (s.type === 'bold') output += `</b>`;
+                else if (s.type === 'italic') output += `</i>`;
+                else if (s.type === 'color') output += `</span>`;
+                stack.splice(i, 1);
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+
+      pos += tagMatch[0].length;
+      continue;
+    }
+
+    // Normal character
+    output += input[pos];
+    pos++;
   }
 
-  // Close any remaining open tags at end of document
-  while (openTags.length > 0) {
-    const tag = openTags.pop();
-    if (tag.type === 'head') outputParts.push(`</${tag.tag}>`);
+  // Close any remaining open tags
+  while (stack.length > 0) {
+    const s = stack.pop();
+    if (s.type === 'head') output += `</${s.tag}>`;
+    else if (s.type === 'bolditalic') output += `</i></b>`;
+    else if (s.type === 'bold') output += `</b>`;
+    else if (s.type === 'italic') output += `</i>`;
+    else if (s.type === 'color') output += `</span>`;
   }
 
-  return outputParts.join('');
+  return output;
 }
