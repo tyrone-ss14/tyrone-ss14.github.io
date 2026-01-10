@@ -5,5 +5,5 @@ function update() {
   paper.innerHTML = parseSS14(editor.value);
 }
 
-editor.addEventListener("editor", update);
+editor.addEventListener("input", update);
 update();
