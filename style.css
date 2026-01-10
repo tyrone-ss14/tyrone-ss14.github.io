@@ -26,11 +26,7 @@ textarea {
   padding: 24px 28px;
   background: var(--paper-color, #f4f1dc);
   color: var(--ink-color, #000);
-  font-family:
-    "Times New Roman",
-    "Liberation Serif",
-    "DejaVu Serif",
-    serif;
+  font-family: "Times New Roman", "Liberation Serif", "DejaVu Serif", serif;
   font-size: 16px;
   line-height: 1.25;
   white-space: pre-wrap;
@@ -41,27 +37,9 @@ textarea {
 }
 
 /* Headings */
-.document h1 {
-  font-size: 1.6em;
-  margin: 0 0 0.4em 0;
-  text-align: center;
-  font-weight: bold;
-}
+.document h1 { font-size: 1.6em; font-weight: bold; margin: 0.2em 0; }
+.document h1:first-child { margin-top: -0.3em; }
+.document h2 { font-size: 1.3em; font-weight: bold; margin: 0.2em 0; }
+.document h3 { font-size: 1.15em; font-weight: bold; margin: 0.2em 0; }
 
-.document h1:first-child {
-  margin-top: -0.3em; /* first-line h1 cut-off */
-}
-
-.document h2 {
-  font-size: 1.3em;
-  margin: 0.6em 0 0.3em 0;
-  font-weight: bold;
-}
-
-.document h3 {
-  font-size: 1.15em;
-  margin: 0.6em 0 0.2em 0;
-  font-weight: bold;
-}
-
-/* Inline styles (bold, italic, underline, color) handled by JS */
+/* Inline tags (JS handles) */
