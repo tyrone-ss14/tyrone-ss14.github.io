@@ -1,0 +1,22 @@
+body {
+  background: #2b2b2b;
+  color: white;
+  font-family: sans-serif;
+}
+
+textarea {
+  width: 90%;
+  height: 200px;
+  background: #111;
+  color: white;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+#paper {
+  width: 600px;
+  background: #f3f0d8;
+  color: black;
+  padding: 20px;
+  font-family: "Times New Roman", serif;
+}
