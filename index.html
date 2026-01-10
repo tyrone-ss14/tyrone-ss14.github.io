@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>SS14 Document Preview</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h2>SS14 Document Simulator</h2>
 
-<h2>SS14 Document Editor</h2>
-
-<textarea id="input">
-[head=1]Captain's Order[/head]
+  <textarea id="input" placeholder="Type SS14 markup here...">
+[head=1]Captain's Log[/head]
 [bold]All crew[/bold] must report to the bridge.
-</textarea>
+[color=red]Warning:[/color] Check the engine room.
+[head=2]Subsection[/head]
+[italic]Remember to log all actions.[/italic]
+[head=3]Minor notes[/head]
+[underline]Do not forget[/underline] safety procedures.
+  </textarea>
 
-<div id="paper" class="document"></div>
+  <div class="document" id="paper"></div>
 
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
