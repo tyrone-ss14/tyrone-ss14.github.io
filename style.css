@@ -38,7 +38,6 @@ textarea {
 
 /* Headings */
 .document h1 { font-size: 1.6em; font-weight: bold; margin: 0.2em 0; }
-.document h1:first-child { margin-top: -0.3em; }
 .document h2 { font-size: 1.3em; font-weight: bold; margin: 0.2em 0; }
 .document h3 { font-size: 1.15em; font-weight: bold; margin: 0.2em 0; }
 
