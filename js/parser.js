@@ -21,41 +21,43 @@ const closeHandlers = {
   }
 };
 
-let outputParts = [];
-let openTags = [];
-let i = 0;
+function parseSS14(text) {
+  let outputParts = [];
+  let openTags = [];
+  let i = 0;
 
-while (i < text.length) {
-  if (text[i] === "[") {
+  while (i < text.length) {
+    if (text[i] === "[") {
 
-    // Match opening tag like [head=1]
-    const openMatch = text.slice(i).match(/^\[head=(\d)\]/);
-    if (openMatch) {
-      const level = openMatch[1];
-      openHandlers.head(level, openTags, outputParts);
-      i += openMatch[0].length;
-      continue;
+      // Match opening tag like [head=1]
+      const openMatch = text.slice(i).match(/^\[head=(\d)\]/);
+      if (openMatch) {
+        const level = openMatch[1];
+        openHandlers.head(level, openTags, outputParts);
+        i += openMatch[0].length;
+        continue;
+      }
+
+      // Match closing tag [/head]
+      const closeMatch = text.slice(i).match(/^\[\/head\]/);
+      if (closeMatch) {
+        closeHandlers.head(openTags, outputParts);
+        i += closeMatch[0].length;
+        continue;
+      }
+  
     }
 
-    // Match closing tag [/head]
-    const closeMatch = text.slice(i).match(/^\[\/head\]/);
-    if (closeMatch) {
-      closeHandlers.head(openTags, outputParts);
-      i += closeMatch[0].length;
-      continue;
-    }
-
+    // default: plain text
+    outputParts.push(text[i]);
+    i++;
   }
 
-  // default: plain text
-  outputParts.push(text[i]);
-  i++;
-}
+  // close remaining tags at end of document
+  while (openTags.length > 0) {
+    const tag = openTags.pop();
+    if (tag.type === 'head') outputParts.push(`</${tag.tag}>`);
+  }
 
-// close remaining tags at end of document
-while (openTags.length > 0) {
-  const tag = openTags.pop();
-  if (tag.type === 'head') outputParts.push(`</${tag.tag}>`);
+  return outputParts.join('');
 }
-
-return outputParts.join('');
