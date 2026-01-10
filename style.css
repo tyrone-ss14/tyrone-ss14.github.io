@@ -22,7 +22,6 @@ textarea {
   color: var(--ink-color, #000);
 
   font-family:
-    "Times New Roman",
     "Liberation Serif",
     "DejaVu Serif",
     serif;
@@ -38,10 +37,15 @@ textarea {
 .document h1 {
   font-size: 1.6em;
   margin: 0 0 0.4em 0;
-  text-align: center;
 }
 
 .document h2 {
   font-size: 1.3em;
   margin: 0.6em 0 0.3em 0;
+}
+
+.document h3 {
+  font-size: 1.15em;
+  margin: 0.6em 0 0.2em 0;
+  font-weight: bold;
 }
