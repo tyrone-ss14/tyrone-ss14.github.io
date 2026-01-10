@@ -13,10 +13,25 @@ textarea {
   margin-bottom: 10px;
 }
 
-#paper {
-  width: 600px;
-  background: #f3f0d8;
-  color: black;
-  padding: 20px;
-  font-family: "Times New Roman", serif;
+.document {
+  width: 440px;
+  min-height: 560px;
+  padding: 24px 28px;
+
+  background: var(--paper-color, #f4f1dc);
+  color: var(--ink-color, #000);
+
+  font-family:
+    "Times New Roman",
+    "Liberation Serif",
+    "DejaVu Serif",
+    serif;
+
+  font-size: 16px;
+  line-height: 1.25;
+
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+
+  box-sizing: border-box;
 }
