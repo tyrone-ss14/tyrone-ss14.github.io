@@ -2,6 +2,10 @@ body {
   background: #2b2b2b;
   color: white;
   font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
 }
 
 textarea {
@@ -10,42 +14,48 @@ textarea {
   background: #111;
   color: white;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  font-family: monospace;
+  font-size: 14px;
+  resize: none;
 }
 
 .document {
   width: 440px;
   min-height: 560px;
   padding: 24px 28px;
-
   background: var(--paper-color, #f4f1dc);
   color: var(--ink-color, #000);
-
   font-family:
+    "Times New Roman",
     "Liberation Serif",
     "DejaVu Serif",
     serif;
-
   font-size: 16px;
   line-height: 1.25;
-
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
   border-radius: 14px;
-
-  box-sizing: border-box;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
+/* Headings */
 .document h1 {
   font-size: 1.6em;
   margin: 0 0 0.4em 0;
+  text-align: center;
+  font-weight: bold;
 }
 
 .document h1:first-child {
-  margin-top: -0.3em; /* adjust until it visually matches */
+  margin-top: -0.3em; /* first-line h1 cut-off */
 }
 
 .document h2 {
   font-size: 1.3em;
   margin: 0.6em 0 0.3em 0;
+  font-weight: bold;
 }
 
 .document h3 {
@@ -53,3 +63,5 @@ textarea {
   margin: 0.6em 0 0.2em 0;
   font-weight: bold;
 }
+
+/* Inline styles (bold, italic, underline, color) handled by JS */
